@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MindFriend 🤖</title>
+    <style>
+        :root {
+            --bg-color: #e0e5ec;
+            --chat-bg: #e0e5ec;
+            --user-msg-bg: #4a90e2;
+            --bot-msg-bg: #e0e5ec;
+            --text-color: #37474f;
+            --shadow-light: 6px 6px 12px #a3b1c6, -6px -6px 12px #ffffff;
+            --shadow-inset: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--text-color);
+            overflow: hidden; /* Evita scroll doble en móviles */
+        }
+
+        #chat-container {
+            width: 100%;
+            height: 100%;
+            background: var(--chat-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Ajuste para computadoras */
+        @media (min-width: 600px) {
+            #chat-container {
+                width: 420px;
+                height: 85vh;
+                border-radius: 30px;
+                box-shadow: var(--shadow-light);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.3rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        #chatbox {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: transparent;
+        }
+
+        /* Scrollbar estético */
+        #chatbox::-webkit-scrollbar { width: 5px; }
+        #chatbox::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        .msg {
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 16px; /* Tamaño 16px evita zoom en iPhone */
+            line-height: 1.5;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot {
+            background: var(--bot-msg-bg);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .user {
+            background: var(--user-msg-bg);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            box-shadow: 2px 4px 8px rgba(74, 144, 226, 0.3);
+        }
+
+        /* Estilo para la burbuja de ALERTA_CRISIS */
+        .crisis-msg {
+            background: #ff4757 !important;
+            color: white !important;
+            font-weight: bold;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4) !important;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        .input-area {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        input {
+            flex: 1;
+            border: none;
+            background: var(--chat-bg);
+            padding: 15px;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            box-shadow: var(--shadow-inset);
+            color: var(--text-color);
+        }
+
+        button {
+            background: var(--user-msg-bg);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-left: 15px;
+            cursor: pointer;
+            box-shadow: 3px 3px 6px #a3b1c6, -2px -2px 5px rgba(255,255,255,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        button:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+    <div id="chat-container">
+        <header>MindFriend 🤖</header>
+        <div id="chatbox">
+            <div class="msg bot">¡Hola! Qué gusto verte por aquí. ¿Cómo te sientes hoy?</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Escribe un mensaje..." autocomplete="off">
+            <button onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById("userInput");
+        const chatbox = document.getElementById("chatbox");
+
+        // Escuchar la tecla Enter
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+
+        function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            // Agregar mensaje del usuario
+            chatbox.innerHTML += `<div class="msg user">${msg}</div>`;
+            input.value = "";
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            // Llamada al servidor Flask
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.reply === "ALERTA_CRISIS") {
+                    // Ventana emergente (Alert)
+                    alert("⚠️ IMPORTANTE: No estás solo. Por favor, comunícate a la Línea de la Vida: 800 911 2000. Tu vida es valiosa y hay personas que quieren escucharte.");
+                    
+                    // Burbuja roja llamativa en el chat
+                    chatbox.innerHTML += `
+                        <div class="msg bot crisis-msg">
+                            LÍNEA DE AYUDA: 800 911 2000 <br>
+                            Por favor, llama o busca a alguien de confianza. Aquí sigo para escucharte, pero ellos pueden ayudarte mejor.
+                        </div>`;
+                } else {
+                    // Respuesta normal de la IA
+                    chatbox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+                }
+                chatbox.scrollTop = chatbox.scrollHeight;
+            })
+            .catch(err => {
+                chatbox.innerHTML += `<div class="msg bot">Oye, algo falló en mi sistema... ¿Me lo repites?</div>`;
+            });
+        }
+    </script>
+</body>
+</html>

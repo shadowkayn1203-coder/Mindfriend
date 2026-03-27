@@ -1,0 +1,56 @@
+============================================================
+       INSTRUCCIONES DE INSTALACIÓN Y USO: MINDFRIEND
+============================================================
+
+MindFriend es un asistente virtual diseñado para brindar apoyo 
+emocional a estudiantes. El sistema utiliza Inteligencia Artificial 
+local para garantizar la privacidad absoluta del usuario.
+
+------------------------------------------------------------
+1. REQUISITOS DEL SISTEMA
+------------------------------------------------------------
+* Python 3.8 o superior instalado.
+* Ollama (Plataforma de IA local). Descarga en: https://ollama.com
+
+------------------------------------------------------------
+2. CONFIGURACIÓN DEL MODELO (PASO CRÍTICO)
+------------------------------------------------------------
+Para que el chat pueda procesar los mensajes, es necesario 
+descargar el modelo "Gemma 3" en su versión ligera (1b).
+
+Abra una terminal (CMD o PowerShell) y ejecute:
+> ollama pull gemma3:1b
+
+*Nota: Asegúrese de que la aplicación Ollama esté abierta 
+ en su barra de tareas antes de continuar.*
+
+------------------------------------------------------------
+3. INSTALACIÓN DE LIBRERÍAS DE PYTHON
+------------------------------------------------------------
+Abra una terminal dentro de la carpeta del proyecto y ejecute:
+> pip install flask requests
+
+------------------------------------------------------------
+4. EJECUCIÓN DEL PROYECTO
+------------------------------------------------------------
+1. En la misma terminal, inicie el servidor de Flask:
+   > python app.py
+
+2. El sistema indicará que está corriendo en http://127.0.0.1:5000
+3. Abra su navegador web y entre a esa dirección.
+
+------------------------------------------------------------
+5. FUNCIONALIDADES CLAVE PARA EVALUAR
+------------------------------------------------------------
+* DISEÑO RESPONSIVO: La interfaz es compatible con celulares y 
+  sigue una estética "Neumórfica" para reducir el estrés visual.
+* MEMORIA CONTEXTUAL: El bot mantiene el hilo de la conversación 
+  gracias al manejo de sesiones de usuario.
+* PROTOCOLO DE CRISIS: Si el usuario menciona frases de riesgo 
+  (autolesión o crisis grave), el sistema detiene la charla y 
+  lanza una VENTANA EMERGENTE con el contacto de la Línea de 
+  la Vida (800 911 2000).
+
+============================================================
+Proyecto desarrollado para fines educativos.
+============================================================
